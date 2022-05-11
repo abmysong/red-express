@@ -1,0 +1,11 @@
+{
+  "name": "express-server",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "description": "express-server",
+  "dependencies": {
+    "express": "^4.17.1",
+    "swagger-ui-express": "^4.1.6"
+  }
+}
