@@ -19,7 +19,7 @@ router.get('/', function(request, response) {
 
 router.patch('/:index', function(request, response) {
   const index = Number(request.params.index);
-  items[index] = request.body;
+  items[index].expire = request.body.expire;
   console.log('Done items patch', items);
   response.status(200).send({
     result: 'Updated'
