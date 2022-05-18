@@ -9,6 +9,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(require('./swagger.json'))
 global.mocks = {
   members: require('./mocks/members.json'),
   items: require('./mocks/items.json'),
+  groceries: require('./mocks/groceries.json'),
 };
 
 // CROSS, Methods, Headers
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use('/api/v1/members', require('./routes/members.js'));
 app.use('/api/v1/search', require('./routes/search.js'));
 app.use('/api/v1/items', require('./routes/items.js'));
+app.use('/api/v1/groceries', require('./routes/groceries.js'));
 
 // Start server
 global.location = new URL('http://localhost:3100');
