@@ -26,8 +26,11 @@ router.patch('/:index', function(request, response) {
   });
 });
 
-router.delete('/:index', function(request, response) {
-  const index = Number(request.params.index);
+router.delete('/:uuid', function(request, response) {
+  const uuid = request.params.uuid;
+  const index = groceries.findIndex(function(grocery) {
+    return grocery.uuid === uuid;
+  });
   groceries.splice(index, 1);
   console.log('Done groceries delete', groceries);
   response.status(200).send({
