@@ -11,6 +11,8 @@ router.post('/', function(request, response) {
     // create
     groceries.push(request.body);
   }
+  // 1줄로 표현
+  // !grocery && groceries.push(request.body);
 
   console.log('Done groceries post', groceries);
   response.status(200).send({
