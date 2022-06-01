@@ -2,7 +2,16 @@ const router = global.express.Router();
 const groceries = global.mocks.groceries;
 
 router.post('/', function(request, response) {
-  groceries.push(request.body);
+  // TODO: uuid가 없으면 push
+  const grocery = groceries.find(function(grocery) {
+    return grocery.uuid === request.body.uuid;
+  });
+
+  if (!grocery) {
+    // create
+    groceries.push(request.body);
+  }
+
   console.log('Done groceries post', groceries);
   response.status(200).send({
     result: 'Created'
