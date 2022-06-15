@@ -2,7 +2,6 @@ const router = global.express.Router();
 const groceries = global.mocks.groceries;
 
 router.post('/', function(request, response) {
-  // TODO: uuid가 없으면 push
   const grocery = groceries.find(function(grocery) {
     return grocery.uuid === request.body.uuid;
   });
@@ -28,9 +27,14 @@ router.get('/', function(request, response) {
   });
 });
 
-router.patch('/:index', function(request, response) {
-  const index = Number(request.params.index);
-  groceries[index].expire = request.body.expire;
+router.patch('/:uuid', function(request, response) {
+  const uuid = request.params.uuid;
+  const grocery = groceries.find(function(grocery) {
+    return grocery.uuid === uuid;
+  });
+  grocery.name = request.body.name;
+  grocery.enter = request.body.enter;
+  grocery.expire = request.body.expire;
   console.log('Done groceries patch', groceries);
   response.status(200).send({
     result: 'Updated'
