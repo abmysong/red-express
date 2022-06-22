@@ -1,5 +1,6 @@
 const router = global.express.Router();
 const groceries = global.mocks.groceries;
+const _ = require('lodash');
 
 router.post('/', function(request, response) {
   const grocery = groceries.find(function(grocery) {
@@ -21,13 +22,16 @@ router.post('/', function(request, response) {
 
 router.get('/', function(request, response) {
   const q = request.query.q;
-  const searchGroceries = [];
+  let searchGroceries = [];
   for (let i = 0; i < groceries.length; i++) {
     const grocery = groceries[i];
     if (grocery.name.indexOf(q) >= 0) {
       searchGroceries.push(grocery);
     }
   }
+  // lodash orderBy 사용
+  searchGroceries = _.orderBy(searchGroceries, request.query.orderByKey, request.query.orderByType);
+
   console.log('Done groceries get', searchGroceries);
   response.status(200).send({
     result: 'Read',
