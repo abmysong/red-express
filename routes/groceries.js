@@ -20,10 +20,18 @@ router.post('/', function(request, response) {
 });
 
 router.get('/', function(request, response) {
-  console.log('Done groceries get', groceries);
+  const q = request.query.q;
+  const searchGroceries = [];
+  for (let i = 0; i < groceries.length; i++) {
+    const grocery = groceries[i];
+    if (grocery.name.indexOf(q) >= 0) {
+      searchGroceries.push(grocery);
+    }
+  }
+  console.log('Done groceries get', searchGroceries);
   response.status(200).send({
     result: 'Read',
-    groceries: groceries
+    groceries: searchGroceries
   });
 });
 
