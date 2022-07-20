@@ -1,5 +1,17 @@
 const router = global.express.Router();
 const members = global.mocks.members;
+const jwtAuth = require('../middlewares/jwtAuth.js');
+
+router.post('/login/', function(request, response) {
+  // TODO: 로그인 가능한 회원인지 확인
+  jwtAuth.tokenCreate(request, response, request.body);
+});
+
+router.get('/login/', jwtAuth.tokenCheck, function(request, response) {
+  response.status(200).send({
+    decoded: request.decoded
+  });
+});
 
 router.post('/', function(request, response) {
   members.push(request.body);

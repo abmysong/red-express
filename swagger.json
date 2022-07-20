@@ -4,7 +4,66 @@
     "title": "REST API members"
   },
   "basePath": "/api/v1",
+  "securityDefinitions": {
+    "jwtHeaderToken": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "x-jwt-token"
+    }
+  },
   "paths": {
+    "/members/login": {
+      "post": {
+        "tags": [
+          "members/login"
+        ],
+        "summary": "Login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/member"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login done"
+          }
+        }
+      },
+      "get": {
+        "security": [
+          {
+            "jwtHeaderToken": []
+          }
+        ],
+        "tags": [
+          "members/login"
+        ],
+        "summary": "Login check",
+        "headers": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/member"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login checked"
+          },
+          "403": {
+            "description": "Login failed"
+          }
+        }
+      }
+    },
     "/members": {
       "get": {
         "tags": [
