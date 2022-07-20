@@ -36,8 +36,11 @@ router.get('/', function(request, response) {
   });
 });
 
-router.patch('/:index', function(request, response) {
-  const index = Number(request.params.index);
+router.patch('/:uuid', function(request, response) {
+  const uuid = request.params.uuid;
+  const index = items.findIndex(function(item) {
+    return item.uuid === uuid;
+  });
   items[index].expire = request.body.expire;
   console.log('Done items patch', items);
   response.status(200).send({
@@ -45,8 +48,11 @@ router.patch('/:index', function(request, response) {
   });
 });
 
-router.delete('/:index', function(request, response) {
-  const index = Number(request.params.index);
+router.delete('/:uuid', function(request, response) {
+  const uuid = request.params.uuid;
+  const index = items.findIndex(function(item) {
+    return item.uuid === uuid;
+  });
   items.splice(index, 1);
   console.log('Done items delete', items);
   response.status(200).send({
