@@ -1,9 +1,11 @@
+const _ = require('lodash');
+const jwtAuth = require('../middlewares/jwtAuth.js');
 const router = global.express.Router();
 const items = global.mocks.items;
 const groceries = global.mocks.groceries;
-const _ = require('lodash');
 
-router.post('/', function(request, response) {
+router.post('/', jwtAuth.tokenCheck, function(request, response) {
+  request.body.memberUuid = request.decoded.memberUuid;
   items.push(request.body);
   console.log('Done items post', items);
   response.status(200).send({
@@ -11,8 +13,11 @@ router.post('/', function(request, response) {
   });
 });
 
-router.get('/', function(request, response) {
-  const orderItems = _.orderBy(items, request.query.orderByKey, request.query.orderByType);
+router.get('/', jwtAuth.tokenCheck, function(request, response) {
+  const filterItems = items.filter(function(item) {
+    return item.memberUuid === request.decoded.memberUuid;
+  });
+  const orderItems = _.orderBy(filterItems, request.query.orderByKey, request.query.orderByType);
 
   // TODO: items를 반복해서 groceries에 동일한 uuid가 있는지 확인 하고 있으면 checked = true 값을 넣는다.
   for (let index = 0; index < orderItems.length; index++) {
