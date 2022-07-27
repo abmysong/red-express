@@ -3,8 +3,16 @@ const members = global.mocks.members;
 const jwtAuth = require('../middlewares/jwtAuth.js');
 
 router.post('/login/', function(request, response) {
-  // TODO: 로그인 가능한 회원인지 확인
-  jwtAuth.tokenCreate(request, response, request.body);
+  const member = members.find(function(member) {
+    return member.name === request.body.name && member.age === Number(request.body.age);
+  });
+  if (member) {
+    jwtAuth.tokenCreate(request, response, member);
+  } else {
+    response.status(403).send({
+      message: 'Name or age is wrong!'
+    });  
+  }
 });
 
 router.get('/login/', jwtAuth.tokenCheck, function(request, response) {

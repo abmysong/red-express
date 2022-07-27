@@ -1,21 +1,26 @@
 [
   {
+    "uuid": "23cd1199-fc94-4d57-8f4a-7b3a96ebbbef",
     "name": "홍길동",
     "age": 39
   },
   {
+    "uuid": "2fcecdea-d774-43f3-a6ac-a007d8bd3e58",
     "name": "김삼순",
     "age": 33
   },
   {
+    "uuid": "e2966382-14c8-4da7-9760-cffce3fae6a5",
     "name": "홍명보",
     "age": 44
   },
   {
+    "uuid": "86cbb7ff-75ff-4001-9f70-44793105a14b",
     "name": "박지삼",
     "age": 22
   },
   {
+    "uuid": "63171b27-cc9b-4035-9ea9-d2cb2c58c680",
     "name": "권명순",
     "age": 10
   }
