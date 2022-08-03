@@ -1,5 +1,6 @@
 const { filter } = require('lodash');
 const _ = require('lodash');
+const moment = require('moment');
 const jwtAuth = require('../middlewares/jwtAuth.js');
 const router = global.express.Router();
 const groceries = global.mocks.groceries;
@@ -44,6 +45,20 @@ router.get('/', jwtAuth.tokenCheck, function(request, response) {
   response.status(200).send({
     result: 'Read',
     groceries: searchGroceries
+  });
+});
+
+router.get('/count', jwtAuth.tokenCheck, function(request, response) {
+  const filterGroceries = groceries.filter(function(grocery) {
+    // 로그인 된 회원의 groceries 찾기
+    // 유통기한이 지난 groceries 찾기
+    return grocery.memberUuid === request.decoded.memberUuid
+      && moment().format('YYYY-MM-DD') > grocery.expire;
+  });
+  console.log('Done groceries count get', filterGroceries.length);
+  response.status(200).send({
+    result: 'Counted',
+    count: filterGroceries.length
   });
 });
 
