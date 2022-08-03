@@ -1,8 +1,11 @@
+const { filter } = require('lodash');
+const _ = require('lodash');
+const jwtAuth = require('../middlewares/jwtAuth.js');
 const router = global.express.Router();
 const groceries = global.mocks.groceries;
-const _ = require('lodash');
 
-router.post('/', function(request, response) {
+router.post('/', jwtAuth.tokenCheck, function(request, response) {
+  request.body.memberUuid = request.decoded.memberUuid;
   const grocery = groceries.find(function(grocery) {
     return grocery.uuid === request.body.uuid;
   });
@@ -20,11 +23,16 @@ router.post('/', function(request, response) {
   });
 });
 
-router.get('/', function(request, response) {
+router.get('/', jwtAuth.tokenCheck, function(request, response) {
+  const filterGroceries = groceries.filter(function(grocery) {
+    return grocery.memberUuid === request.decoded.memberUuid;
+  });
+  const orderGroceries = _.orderBy(filterGroceries, request.query.orderByKey, request.query.orderByType);
+
   const q = request.query.q;
   let searchGroceries = [];
-  for (let i = 0; i < groceries.length; i++) {
-    const grocery = groceries[i];
+  for (let i = 0; i < orderGroceries.length; i++) {
+    const grocery = orderGroceries[i];
     if (grocery.name.indexOf(q) >= 0) {
       searchGroceries.push(grocery);
     }
