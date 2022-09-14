@@ -12,6 +12,9 @@ global.mocks = {
   groceries: require('./mocks/groceries.json'),
 };
 
+// MySQL
+global.db = require('./mysql-connector.js');
+
 // CROSS, Methods, Headers
 app.use(function(request, response, next) {
   response.setHeader('Access-Control-Allow-Origin', '*');

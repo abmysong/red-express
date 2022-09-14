@@ -3,13 +3,27 @@ const jwtAuth = require('../middlewares/jwtAuth.js');
 const router = global.express.Router();
 const items = global.mocks.items;
 const groceries = global.mocks.groceries;
+const db = global.db;
 
 router.post('/', jwtAuth.tokenCheck, function(request, response) {
   request.body.memberUuid = request.decoded.memberUuid;
-  items.push(request.body);
-  console.log('Done items post', items);
-  response.status(200).send({
-    result: 'Created'
+  // items.push(request.body);
+  const sql = `
+    insert into items(member_pk, name, enter, expire)
+    values (
+      1,
+      ?,
+      date_format(now(), '%Y-%m-%d'),
+      date_format(date_add(now(), interval + 2 week), '%Y-%m-%d')
+    );
+  `;
+  db.query(sql, [request.body.name], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done items post', rows);
+      response.status(200).send({
+        result: 'Created'
+      });
+    }
   });
 });
 
