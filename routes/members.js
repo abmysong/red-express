@@ -1,18 +1,34 @@
 const router = global.express.Router();
 const members = global.mocks.members;
+const db = global.db;
 const jwtAuth = require('../middlewares/jwtAuth.js');
 
 router.post('/login/', function(request, response) {
-  const member = members.find(function(member) {
-    return member.name === request.body.name && member.age === Number(request.body.age);
+  const sql = `
+    select * from members
+    where name = ? and age = ?;
+  `;
+  db.query(sql, [request.body.name, request.body.age], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done items post', rows[0]);
+      let member = rows[0];
+      if (member) {
+        // 전개구조 Babel, DB에서 받은 오브젝트는 토큰 생성이 불가하여 일반 오브젝트로 변경
+        // 전개구조는 대괄호 또는 중괄호를 제거
+        member = {...rows[0]};
+        // member = {
+        //   member_pk: rows[0].member_pk,
+        //   name: rows[0].name,
+        //   age: rows[0].age
+        // };
+        jwtAuth.tokenCreate(request, response, member);
+      } else {
+        response.status(403).send({
+          message: 'Name or age is wrong!'
+        });  
+      }
+    }
   });
-  if (member) {
-    jwtAuth.tokenCreate(request, response, member);
-  } else {
-    response.status(403).send({
-      message: 'Name or age is wrong!'
-    });  
-  }
 });
 
 router.get('/login/', jwtAuth.tokenCheck, function(request, response) {
