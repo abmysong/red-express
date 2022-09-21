@@ -10,7 +10,7 @@ router.post('/login/', function(request, response) {
   `;
   db.query(sql, [request.body.name, request.body.age], function(error, rows) {
     if (!error || db.error(request, response, error)) {
-      console.log('Done items post', rows[0]);
+      console.log('Done members login post', rows[0]);
       let member = rows[0];
       if (member) {
         // 전개구조 Babel, DB에서 받은 오브젝트는 토큰 생성이 불가하여 일반 오브젝트로 변경

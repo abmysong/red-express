@@ -6,18 +6,16 @@ const groceries = global.mocks.groceries;
 const db = global.db;
 
 router.post('/', jwtAuth.tokenCheck, function(request, response) {
-  request.body.memberUuid = request.decoded.memberUuid;
-  // items.push(request.body);
   const sql = `
     insert into items(member_pk, name, enter, expire)
     values (
-      1,
+      ?,
       ?,
       date_format(now(), '%Y-%m-%d'),
       date_format(date_add(now(), interval + 2 week), '%Y-%m-%d')
     );
   `;
-  db.query(sql, [request.body.name], function(error, rows) {
+  db.query(sql, [request.decoded.member_pk, request.body.name], function(error, rows) {
     if (!error || db.error(request, response, error)) {
       console.log('Done items post', rows);
       response.status(200).send({
@@ -28,30 +26,29 @@ router.post('/', jwtAuth.tokenCheck, function(request, response) {
 });
 
 router.get('/', jwtAuth.tokenCheck, function(request, response) {
-  const filterItems = items.filter(function(item) {
-    return item.memberUuid === request.decoded.memberUuid;
-  });
-  const orderItems = _.orderBy(filterItems, request.query.orderByKey, request.query.orderByType);
-
-  // TODO: items를 반복해서 groceries에 동일한 uuid가 있는지 확인 하고 있으면 checked = true 값을 넣는다.
-  for (let index = 0; index < orderItems.length; index++) {
-    const item = orderItems[index];
-    console.log(item);
-
-    // groceries 데이터 확인
-    const grocery = groceries.find(function(grocery) {
-      return grocery.uuid === item.uuid;
-    });
-    if (grocery) {
-      item.checked = true;
-    } else {
-      item.checked = false;
+  const sql = `
+    select
+      item_pk,
+      member_pk,
+      name,
+      date_format(enter, '%Y-%m-%d') as enter,
+      date_format(expire, '%Y-%m-%d') as expire
+      , (
+        select grocery_pk from groceries g where g.grocery_pk = i.item_pk
+      ) as grocery_pk
+    from items i
+    where member_pk = ?
+    order by ${request.query.orderByKey} ${request.query.orderByType}
+    ;
+  `;
+  db.query(sql, [request.decoded.member_pk], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done items get', rows);
+      response.status(200).send({
+        result: 'Read',
+        items: rows
+      });
     }
-  }
-  console.log('Done items get', orderItems);
-  response.status(200).send({
-    result: 'Read',
-    items: orderItems
   });
 });
 
