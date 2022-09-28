@@ -61,17 +61,18 @@ router.get('/count', jwtAuth.tokenCheck, function(request, response) {
   });
 });
 
-router.patch('/:uuid', function(request, response) {
-  const uuid = request.params.uuid;
-  const grocery = groceries.find(function(grocery) {
-    return grocery.uuid === uuid;
-  });
-  grocery.name = request.body.name;
-  grocery.enter = request.body.enter;
-  grocery.expire = request.body.expire;
-  console.log('Done groceries patch', groceries);
-  response.status(200).send({
-    result: 'Updated'
+router.patch('/:grocery_pk', function(request, response) {
+  const grocery_pk = request.params.grocery_pk;
+  const sql = `
+    update groceries set name = ?, enter = ?, expire = ? where grocery_pk = ?;
+  `;
+  db.query(sql, [request.body.name, request.body.enter, request.body.expire, grocery_pk], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done groceries patch', rows);
+      response.status(200).send({
+        result: 'Updated'
+      });
+    }
   });
 });
 
