@@ -64,15 +64,18 @@ router.patch('/:uuid', function(request, response) {
   });
 });
 
-router.delete('/:uuid', function(request, response) {
-  const uuid = request.params.uuid;
-  const index = items.findIndex(function(item) {
-    return item.uuid === uuid;
-  });
-  items.splice(index, 1);
-  console.log('Done items delete', items);
-  response.status(200).send({
-    result: 'Deleted'
+router.delete('/:item_pk', function(request, response) {
+  const item_pk = request.params.item_pk;
+  const sql = `
+    delete from items where item_pk = ?;
+  `;
+  db.query(sql, [item_pk], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done items delete', items);
+      response.status(200).send({
+        result: 'Deleted'
+      });
+    }
   });
 });
 
