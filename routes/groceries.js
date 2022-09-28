@@ -23,26 +23,27 @@ router.post('/', jwtAuth.tokenCheck, function(request, response) {
 });
 
 router.get('/', jwtAuth.tokenCheck, function(request, response) {
-  const filterGroceries = groceries.filter(function(grocery) {
-    return grocery.memberUuid === request.decoded.memberUuid;
-  });
-  const orderGroceries = _.orderBy(filterGroceries, request.query.orderByKey, request.query.orderByType);
-
   const q = request.query.q;
-  let searchGroceries = [];
-  for (let i = 0; i < orderGroceries.length; i++) {
-    const grocery = orderGroceries[i];
-    if (grocery.name.indexOf(q) >= 0) {
-      searchGroceries.push(grocery);
+  const sql = `
+    select
+      grocery_pk,
+      member_pk,
+      name,
+      date_format(enter, '%Y-%m-%d') as enter,
+      date_format(expire, '%Y-%m-%d') as expire
+    from groceries
+    where member_pk = ? and name like '%${q}%'
+    order by ${request.query.orderByKey} ${request.query.orderByType}
+    ;
+  `;
+  db.query(sql, [request.decoded.member_pk], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done groceries get', rows);
+      response.status(200).send({
+        result: 'Read',
+        groceries: rows
+      });
     }
-  }
-  // lodash orderBy 사용
-  searchGroceries = _.orderBy(searchGroceries, request.query.orderByKey, request.query.orderByType);
-
-  console.log('Done groceries get', searchGroceries);
-  response.status(200).send({
-    result: 'Read',
-    groceries: searchGroceries
   });
 });
 
