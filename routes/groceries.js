@@ -74,15 +74,18 @@ router.patch('/:uuid', function(request, response) {
   });
 });
 
-router.delete('/:uuid', function(request, response) {
-  const uuid = request.params.uuid;
-  const index = groceries.findIndex(function(grocery) {
-    return grocery.uuid === uuid;
-  });
-  groceries.splice(index, 1);
-  console.log('Done groceries delete', groceries);
-  response.status(200).send({
-    result: 'Deleted'
+router.delete('/:grocery_pk', function(request, response) {
+  const grocery_pk = request.params.grocery_pk;
+  const sql = `
+    delete from groceries where grocery_pk = ?;
+  `;
+  db.query(sql, [grocery_pk], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done groceries delete', rows);
+      response.status(200).send({
+        result: 'Deleted'
+      });
+    }
   });
 });
 
