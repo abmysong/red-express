@@ -52,15 +52,18 @@ router.get('/', jwtAuth.tokenCheck, function(request, response) {
   });
 });
 
-router.patch('/:uuid', function(request, response) {
-  const uuid = request.params.uuid;
-  const index = items.findIndex(function(item) {
-    return item.uuid === uuid;
-  });
-  items[index].expire = request.body.expire;
-  console.log('Done items patch', items);
-  response.status(200).send({
-    result: 'Updated'
+router.patch('/:item_pk', function(request, response) {
+  const item_pk = request.params.item_pk;
+  const sql = `
+    update items set expire = ? where item_pk = ?;
+  `;
+  db.query(sql, [request.body.expire, item_pk], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done items patch', rows);
+      response.status(200).send({
+        result: 'Updated'
+      });
+    }
   });
 });
 
@@ -71,7 +74,7 @@ router.delete('/:item_pk', function(request, response) {
   `;
   db.query(sql, [item_pk], function(error, rows) {
     if (!error || db.error(request, response, error)) {
-      console.log('Done items delete', items);
+      console.log('Done items delete', rows);
       response.status(200).send({
         result: 'Deleted'
       });
