@@ -48,16 +48,21 @@ router.get('/', jwtAuth.tokenCheck, function(request, response) {
 });
 
 router.get('/count', jwtAuth.tokenCheck, function(request, response) {
-  const filterGroceries = groceries.filter(function(grocery) {
-    // 로그인 된 회원의 groceries 찾기
-    // 유통기한이 지난 groceries 찾기
-    return grocery.memberUuid === request.decoded.memberUuid
-      && moment().format('YYYY-MM-DD') > grocery.expire;
-  });
-  console.log('Done groceries count get', filterGroceries.length);
-  response.status(200).send({
-    result: 'Counted',
-    count: filterGroceries.length
+  const sql = `
+    select
+      count(*) as count
+    from groceries
+    where member_pk = ? and expire < now()
+    ;
+  `;
+  db.query(sql, [request.decoded.member_pk], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done groceries count get', rows);
+      response.status(200).send({
+        result: 'Counted',
+        count: rows[0].count
+      });
+    }
   });
 });
 
