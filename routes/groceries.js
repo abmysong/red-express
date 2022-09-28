@@ -6,21 +6,19 @@ const router = global.express.Router();
 const groceries = global.mocks.groceries;
 
 router.post('/', jwtAuth.tokenCheck, function(request, response) {
-  request.body.memberUuid = request.decoded.memberUuid;
-  const grocery = groceries.find(function(grocery) {
-    return grocery.uuid === request.body.uuid;
-  });
-
-  if (!grocery) {
-    // create
-    groceries.push(request.body);
-  }
-  // 1줄로 표현
-  // !grocery && groceries.push(request.body);
-
-  console.log('Done groceries post', groceries);
-  response.status(200).send({
-    result: 'Created'
+  const sql = `
+    insert into groceries (
+      select item_pk as grocery_pk, member_pk, name, enter, expire from items
+      where item_pk = ?
+    );
+  `;
+  db.query(sql, [request.body.item_pk], function(error, rows) {
+    if (!error || db.error(request, response, error)) {
+      console.log('Done groceries post', rows);
+      response.status(200).send({
+        result: 'Created'
+      });
+    }
   });
 });
 
