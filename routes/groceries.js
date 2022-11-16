@@ -32,11 +32,11 @@ router.get('/', jwtAuth.tokenCheck, function(request, response) {
       date_format(enter, '%Y-%m-%d') as enter,
       date_format(expire, '%Y-%m-%d') as expire
     from groceries
-    where member_pk = ? and name like '%${q}%'
+    where member_pk = ? and name like ?
     order by ${request.query.orderByKey} ${request.query.orderByType}
     ;
   `;
-  db.query(sql, [request.decoded.member_pk], function(error, rows) {
+  db.query(sql, [request.decoded.member_pk, '%' + q + '%'], function(error, rows) {
     if (!error || db.error(request, response, error)) {
       console.log('Done groceries get', rows);
       response.status(200).send({
